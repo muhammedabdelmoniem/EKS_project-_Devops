@@ -1,0 +1,34 @@
+---
+- name: Build a Containerized App from the Deepops Academy Website and Store it in the Docker Hub
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Create a Directory to Clone the Repo in it
+      command:
+        cmd: mkdir -p /opt/ansible/mywebsite
+
+    - name: Cloning the Github Repo
+      git:
+        repo: https://github.com/muhammedabdelmoniem/HTML_And_CSS_Template_Three.git
+        dest: /opt/ansible/mywebsite
+
+    - name: Build the Docker Image
+      command:
+        chdir: /opt/ansible/mywebsite
+        cmd: docker build -t mywebsite .
+
+    - name: Show Images After Build
+      shell: docker images
+      register: docker_images_output
+
+    - name: Display Docker Images Output
+      debug:
+        var: docker_images_output.stdout_lines
+
+    - name: Tag the New Image Before Pushing to the Docker Hub
+      command:
+        cmd: docker tag mywebsite mabdelmoniem/website_project:latest
+
+    - name: Push the Tagged Image to the Docker Hub
+      command:
+        cmd: docker push mabdelmoniem/website_project:latest
